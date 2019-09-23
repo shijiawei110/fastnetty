@@ -1,7 +1,6 @@
 package com.sjw.fastnetty.utils;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,12 +40,9 @@ public class ChannelHelper {
         }
         if (channel.isActive()) {
             final String addrRemote = getRemoteAddr(channel);
-            channel.close().addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    log.info("fastnetty close a channel -> remote address[{}] isSuccess: {}", addrRemote, future.isSuccess());
-                }
-            });
+            channel.close().addListener(
+                    (ChannelFutureListener) future -> log.info("fastnetty close a channel -> remote address[{}] isSuccess: {}", addrRemote, future.isSuccess())
+            );
         }
     }
 
