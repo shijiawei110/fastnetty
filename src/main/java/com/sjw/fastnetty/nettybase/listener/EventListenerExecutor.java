@@ -44,7 +44,7 @@ public class EventListenerExecutor implements Runnable{
 
     @Override
     public void run(){
-        log.info("netty event listen thread start");
+        log.info("fastnetty event listen thread start");
         while(!isStopFlag){
             try {
                 ListenEvent event = this.eventQueue.poll(2000, TimeUnit.MILLISECONDS);
@@ -64,9 +64,9 @@ public class EventListenerExecutor implements Runnable{
                     }
                 }
             } catch (Exception e) {
-                log.error("netty event listen exception -> ", e);
+                log.error("fastnetty event listen exception -> ", e);
             }
         }
-        log.info("netty event listen thread end");
+        log.info("fastnetty event listen thread end");
     }
 }

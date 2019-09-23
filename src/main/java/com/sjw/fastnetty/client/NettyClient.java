@@ -5,7 +5,7 @@ import com.sjw.fastnetty.common.ReqCmdProcessorHolder;
 import com.sjw.fastnetty.common.RequestAfter;
 import com.sjw.fastnetty.common.RequestBefore;
 import com.sjw.fastnetty.enums.SystemRunStatus;
-import com.sjw.fastnetty.exception.MagiException;
+import com.sjw.fastnetty.exception.FastNettyException;
 import com.sjw.fastnetty.nettybase.NettyBase;
 import com.sjw.fastnetty.nettybase.listener.ChannelEventListener;
 import com.sjw.fastnetty.nettybase.service.NetWorkClient;
@@ -43,7 +43,6 @@ public class NettyClient extends NettyBase implements NetWorkClient {
     private ClientChannelHandles clientChannelHandles;
 
     private boolean isOpenEventListen = false;
-
 
     public NettyClient(NettyClientBuilder nettyClientBuilder) {
         this(nettyClientBuilder, null);
@@ -121,7 +120,7 @@ public class NettyClient extends NettyBase implements NetWorkClient {
             CmdPackage response = doCmdSync(channel, cmd, nettyClientBuilder.getOutTimeMills());
             return response;
         } else {
-            throw MagiException.CLIENT_GET_CHANNEL_ERROR;
+            throw FastNettyException.CLIENT_GET_CHANNEL_ERROR;
         }
     }
 
@@ -133,7 +132,7 @@ public class NettyClient extends NettyBase implements NetWorkClient {
         if (ChannelHelper.alive(channel)) {
             doOneWay(channel, cmd, nettyClientBuilder.getOutTimeMills());
         } else {
-            throw MagiException.CLIENT_GET_CHANNEL_ERROR;
+            throw FastNettyException.CLIENT_GET_CHANNEL_ERROR;
         }
     }
 
@@ -141,7 +140,7 @@ public class NettyClient extends NettyBase implements NetWorkClient {
     @Override
     public void registerCmdProcessor(Integer code, ReqCmdProcessorHolder holder) {
         if (null == holder.getExecutorService()) {
-            throw MagiException.PARAMS_ERROR;
+            throw FastNettyException.PARAMS_ERROR;
         }
         clientChannelHandles.getClientHandle().base().registerReqCmdProcessor(code, holder);
     }
@@ -165,7 +164,7 @@ public class NettyClient extends NettyBase implements NetWorkClient {
     private Channel safeGetChannel(final String address) throws InterruptedException {
         //校验系统运行状态
         if (!checkSystemStatus()) {
-            throw MagiException.CLIENT_SYSYTEM_ENDING;
+            throw FastNettyException.CLIENT_SYSYTEM_ENDING;
         }
 //        long start = System.currentTimeMillis();
         //先要获取channel  再调用同步请求
@@ -179,7 +178,7 @@ public class NettyClient extends NettyBase implements NetWorkClient {
 
     private Channel getChannel(String address) throws InterruptedException {
         if (StringUtils.isBlank(address)) {
-            throw MagiException.PARAMS_ERROR;
+            throw FastNettyException.PARAMS_ERROR;
         }
         Channel c = ctGet(address);
         if (ChannelHelper.alive(c)) {
@@ -192,7 +191,7 @@ public class NettyClient extends NettyBase implements NetWorkClient {
         boolean getLockFlag = false;
         try {
             if (!clientChannelHandles.getClientHandle().getChannelTableKeeper().tryLock()) {
-                throw MagiException.CLIENT_GET_CHANNEL_TABLE_LOCK_OUT_TIME;
+                throw FastNettyException.CLIENT_GET_CHANNEL_TABLE_LOCK_OUT_TIME;
             }
             getLockFlag = true;
             Channel channel = ctGet(address);

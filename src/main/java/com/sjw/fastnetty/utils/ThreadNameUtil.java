@@ -11,7 +11,7 @@ import java.util.Random;
  */
 public class ThreadNameUtil {
 
-    private static final String DEFAULT_THREAD_NAME = "default-magi-thread";
+    private static final String DEFAULT_THREAD_NAME = "fastnetty-thread";
 
     public static String getName(String threadName) {
         Random random = new Random();

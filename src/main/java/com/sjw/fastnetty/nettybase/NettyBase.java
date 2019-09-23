@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import com.sjw.fastnetty.client.SystemClosePolling;
 import com.sjw.fastnetty.common.CmdFuture;
 import com.sjw.fastnetty.common.SemaphoreOnce;
-import com.sjw.fastnetty.exception.MagiException;
+import com.sjw.fastnetty.exception.FastNettyException;
 import com.sjw.fastnetty.nettybase.listener.ChannelEventListener;
 import com.sjw.fastnetty.nettybase.listener.EventListenerExecutor;
 import com.sjw.fastnetty.protocol.CmdPackage;
@@ -72,7 +72,7 @@ public class NettyBase {
             eventListenerExecutor.setListener(channelEventListener);
             listenerThread = new Thread(eventListenerExecutor, ThreadNameUtil.getName("event-listen"));
             listenerThread.start();
-            log.info("magi netty server channel event listener start succeed");
+            log.info("fastnetty server channel event listener start succeed");
         }
     }
 
@@ -137,7 +137,7 @@ public class NettyBase {
                     cmdFuture.setSendRequestSuccess(false);
                     cmdContainer.remove(sn);
                     cmdFuture.putResponse(null);
-                    log.info("magi sync send a cmd fail -> to addr ={}", linkAddr);
+                    log.info("fastnetty sync send a cmd fail -> to addr ={}", linkAddr);
                 }
             });
 
@@ -145,15 +145,15 @@ public class NettyBase {
             if (null == cmdPackage) {
                 if (cmdFuture.isSendRequestSuccess()) {
                     //超时
-                    throw MagiException.SEND_CMD_OUT_TIME;
+                    throw FastNettyException.SEND_CMD_OUT_TIME;
                 } else {
                     //发送失败
-                    throw MagiException.SEND_CMD_FAIL;
+                    throw FastNettyException.SEND_CMD_FAIL;
                 }
             }
             //如果应答异常 log记录
             if (ResponseCodeType.ERROR == cmdPackage.getResponseCodeType()) {
-                log.info("magi system receive a response handle error -> addr ={},errCode={},errMsg={}",
+                log.info("fastnetty system receive a response handle error -> addr ={},errCode={},errMsg={}",
                         linkAddr, cmdPackage.getErrorCode(), cmdPackage.getErrorMsg());
             }
             return cmdPackage;

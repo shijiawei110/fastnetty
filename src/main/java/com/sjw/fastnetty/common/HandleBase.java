@@ -94,9 +94,7 @@ public class HandleBase {
      * 处理单向请求
      */
     public void doOneWayRequest(Channel channel, CmdPackage cmdPackage) {
-        //啥事不做 打个日志
-//        log.info("magi system receive an one way msg ->addr = {} ,cmd={}",
-//                ChannelHelper.getRemoteAddr(channel), cmdPackage.toString());
+        //啥事不做 可以打个日志
     }
 
     /**

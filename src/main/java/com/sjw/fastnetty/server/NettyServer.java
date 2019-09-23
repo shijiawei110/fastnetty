@@ -3,7 +3,7 @@ package com.sjw.fastnetty.server;
 import com.sjw.fastnetty.common.ReqCmdProcessorHolder;
 import com.sjw.fastnetty.common.RequestAfter;
 import com.sjw.fastnetty.common.RequestBefore;
-import com.sjw.fastnetty.exception.MagiException;
+import com.sjw.fastnetty.exception.FastNettyException;
 import com.sjw.fastnetty.nettybase.NettyBase;
 import com.sjw.fastnetty.nettybase.listener.ChannelEventListener;
 import com.sjw.fastnetty.nettybase.service.NetWorkServer;
@@ -91,9 +91,9 @@ public class NettyServer extends NettyBase implements NetWorkServer {
         //开启服务
         try {
             ChannelFuture sync = bootstrap.bind().sync();
-            log.info("magi netty server start succeed! listener port ={}", nettyServerBuilder.getListenerPort());
+            log.info("fastnetty netty server start succeed! listener port ={}", nettyServerBuilder.getListenerPort());
         } catch (InterruptedException e) {
-            throw new RuntimeException("magi netty server start InterruptedException", e);
+            throw new RuntimeException("fastnetty netty server start InterruptedException", e);
         }
 
         //启动自定义事件监听
@@ -134,7 +134,7 @@ public class NettyServer extends NettyBase implements NetWorkServer {
     @Override
     public void registerCmdProcessor(Integer code, ReqCmdProcessorHolder holder) {
         if (null == holder.getExecutorService()) {
-            throw MagiException.PARAMS_ERROR;
+            throw FastNettyException.PARAMS_ERROR;
         }
         serverChannelHandles.getServerHandle().base().registerReqCmdProcessor(code, holder);
     }

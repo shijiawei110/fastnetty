@@ -20,11 +20,11 @@ public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             //写入心跳包 并且监听
-//            log.info("magi system server trigger a heart beat event so we will do a check to client");
+//            log.info("fastnetty server trigger a heart beat event so we will do a check to client");
 //            CmdPackage request = CmdPackage.createReq(ReqCmdProcessorCodeConstant.SERVER_TRIGGER_TRY,null);
 //            ctx.writeAndFlush(request).addListener(MyChannelFutureListener.CLOSE_REMOTING_CLIENT);
             Channel channel = ctx.channel();
-            log.info("magi system take a break heart beat so we close the channel -> addr={}", ChannelHelper.getRemoteAddr(channel));
+            log.info("fastnetty system take a break heart beat so we close the channel -> addr={}", ChannelHelper.getRemoteAddr(channel));
             ChannelHelper.closeChannel(channel);
         } else {
             //不是心跳类型 继续向下游传递

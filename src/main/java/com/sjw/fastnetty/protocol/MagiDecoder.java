@@ -28,7 +28,7 @@ public class MagiDecoder extends ByteToMessageDecoder {
         int protocolCode = in.readInt();
         if (protocolCode != ProtocolConstant.MAGI_PROTOCOL_CODE) {
             ctx.close();
-            log.info("magi decoder take a error so close channel -> cause of protocol code differ , addr={}", linkAddress);
+            log.info("fastnetty decoder take a error so close channel -> cause of protocol code differ , addr={}", linkAddress);
             return;
         }
 
@@ -36,7 +36,7 @@ public class MagiDecoder extends ByteToMessageDecoder {
         byte protocolVersion = in.readByte();
         if (protocolVersion != ProtocolConstant.MAGI_PROTOCOL_VERSION) {
             ctx.close();
-            log.info("magi decoder take a error so close channel -> cause of protocol version differ , addr={}", linkAddress);
+            log.info("fastnetty decoder take a error so close channel -> cause of protocol version differ , addr={}", linkAddress);
             return;
         }
 
@@ -48,7 +48,7 @@ public class MagiDecoder extends ByteToMessageDecoder {
         SerializeMethod serializeMethod = SerializeFactory.getSerializeMethod(serializeMethodCode);
         if (null == serializeMethod) {
             ctx.close();
-            log.info("magi decoder take a error so close channel -> cause of serialize code is illegal , addr={}", linkAddress);
+            log.info("fastnetty decoder take a error so close channel -> cause of serialize code is illegal , addr={}", linkAddress);
             return;
         }
 
@@ -57,7 +57,7 @@ public class MagiDecoder extends ByteToMessageDecoder {
         // 我们读到的消息体长度为0，这是不应该出现的情况.
         if (dataLength < 0) {
             ctx.close();
-            log.info("magi decoder take a error so close channel -> cause of data length < 0 , addr={}", linkAddress);
+            log.info("fastnetty decoder take a error so close channel -> cause of data length < 0 , addr={}", linkAddress);
             return;
         }
 
@@ -65,7 +65,7 @@ public class MagiDecoder extends ByteToMessageDecoder {
         int realLength = in.readableBytes();
         if (dataLength != realLength) {
             ctx.close();
-            log.info("magi decoder take a error so close channel -> cause of data length < 0 , addr={} ," +
+            log.info("fastnetty decoder take a error so close channel -> cause of data length < 0 , addr={} ," +
                     "protocolLengrh={}, realLength={}", linkAddress, dataLength, realLength);
             return;
         }

@@ -83,7 +83,7 @@ public class ServerHandle extends SimpleChannelInboundHandler<CmdPackage> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         Channel channel = ctx.channel();
         String addr = ChannelHelper.getRemoteAddr(ctx.channel());
-        log.error("fastnetty server channel handler happen a exception so magi close this channel" +
+        log.error("fastnetty server channel handler happen a exception so close this channel" +
                 "-> remoteAddr = {},stack={}", addr, ExceptionUtils.getStackTrace(cause));
         if (handleBase.isOpenEventListener()) {
             handleBase.getEventListenerExecutor().addEvent(new ListenEvent(ListenEventType.EXCEPTION, addr, channel));

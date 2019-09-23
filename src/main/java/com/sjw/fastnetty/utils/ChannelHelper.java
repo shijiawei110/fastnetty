@@ -44,7 +44,7 @@ public class ChannelHelper {
             channel.close().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
-                    log.info("magi system close a channel -> remote address[{}] isSuccess: {}", addrRemote, future.isSuccess());
+                    log.info("fastnetty close a channel -> remote address[{}] isSuccess: {}", addrRemote, future.isSuccess());
                 }
             });
         }

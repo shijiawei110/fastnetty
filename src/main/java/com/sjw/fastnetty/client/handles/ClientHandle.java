@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import com.sjw.fastnetty.client.SystemClosePolling;
 import com.sjw.fastnetty.common.HandleBase;
 import com.sjw.fastnetty.enums.SystemRunStatus;
-import com.sjw.fastnetty.exception.MagiException;
+import com.sjw.fastnetty.exception.FastNettyException;
 import com.sjw.fastnetty.nettybase.listener.ListenEvent;
 import com.sjw.fastnetty.nettybase.listener.ListenEventType;
 import com.sjw.fastnetty.protocol.CmdPackage;
@@ -115,7 +115,7 @@ public class ClientHandle extends SimpleChannelInboundHandler<CmdPackage> {
         boolean getLockFlag = false;
         try {
             if (!channelTableKeeper.tryLock()) {
-                throw MagiException.CLIENT_GET_CHANNEL_TABLE_LOCK_OUT_TIME;
+                throw FastNettyException.CLIENT_GET_CHANNEL_TABLE_LOCK_OUT_TIME;
             }
             getLockFlag = true;
             channelTable.entrySet().removeIf(entry -> entry.getValue() == channel);
