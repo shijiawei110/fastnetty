@@ -85,6 +85,9 @@ public class NettyClient extends NettyBase implements NetWorkClient {
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) nettyClientBuilder.getOutTimeMills())
                 .handler(clientChannelHandles);
 
+        //设置base的handle base
+        handleBase = clientChannelHandles.getClientHandle().base();
+
         //启动自定义事件监听
         startEventListen();
 

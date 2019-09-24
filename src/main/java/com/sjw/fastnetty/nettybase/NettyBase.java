@@ -3,6 +3,7 @@ package com.sjw.fastnetty.nettybase;
 import com.google.common.collect.Maps;
 import com.sjw.fastnetty.client.SystemClosePolling;
 import com.sjw.fastnetty.common.CmdFuture;
+import com.sjw.fastnetty.common.HandleBase;
 import com.sjw.fastnetty.common.SemaphoreOnce;
 import com.sjw.fastnetty.exception.FastNettyException;
 import com.sjw.fastnetty.nettybase.listener.ChannelEventListener;
@@ -37,6 +38,10 @@ public class NettyBase {
      * 最短超时时间不能低于这个数字
      **/
     protected static final long MIN_TIME_OUT_MILLS = 300L;
+    /**
+     * 基础handle执行器
+     */
+    protected HandleBase handleBase;
 
     private ChannelEventListener channelEventListener;
 
@@ -50,7 +55,11 @@ public class NettyBase {
     /**
      * 单向指令限流器
      */
-    private Semaphore oneWayLimit = new Semaphore(1024);
+    private Semaphore oneWayLimit = new Semaphore(2048);
+    /**
+     * 异步指令限流器
+     */
+    private Semaphore asyncLimit = new Semaphore(2048);
 
     protected EventListenerExecutor eventListenerExecutor = new EventListenerExecutor();
 
@@ -191,5 +200,9 @@ public class NettyBase {
                     this.oneWayLimit.availablePermits());
         }
     }
+
+    /**
+     * 异步指令
+     */
 
 }

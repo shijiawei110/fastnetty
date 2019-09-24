@@ -96,6 +96,9 @@ public class NettyServer extends NettyBase implements NetWorkServer {
             throw new RuntimeException("fastnetty netty server start InterruptedException", e);
         }
 
+        //设置base的handle base
+        handleBase = serverChannelHandles.getServerHandle().base();
+
         //启动自定义事件监听
         startEventListen();
 

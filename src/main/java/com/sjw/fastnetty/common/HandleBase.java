@@ -167,16 +167,35 @@ public class HandleBase {
             }
             if (currentChannel == channel) {
                 //match 到请求 关闭这个request
-                asyncRequestClose(next.getKey());
+                requestClose(next.getKey());
             }
         }
     }
 
     /**
-     * 用于异步指令 关闭请求后还要继续执行 失败的callback
+     * 请求被关闭
      */
-    private void asyncRequestClose(long sn) {
+    protected void requestClose(long sn) {
         CmdFuture cmdFuture = cmdContainer.remove(sn);
-        //后续增加异步指令的操作
+        //异步指令关闭操作
+        if (cmdFuture != null) {
+            cmdFuture.setSendRequestSuccess(false);
+            cmdFuture.putResponse(null);
+            try {
+                executeAsyncCallback(cmdFuture);
+            } catch (Throwable e) {
+                log.warn("execute callback in request close, and callback throw", e);
+            } finally {
+                cmdFuture.releaseSemaphore();
+            }
+        }
     }
+
+    /**
+     * 执行异步请求callback
+     */
+    protected void executeAsyncCallback(CmdFuture cmdFuture){
+        //获取异步任务线程池
+    }
+
 }
