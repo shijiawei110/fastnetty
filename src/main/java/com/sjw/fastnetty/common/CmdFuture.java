@@ -51,6 +51,13 @@ public class CmdFuture {
         this.countDownLatch.countDown();
     }
 
+    public boolean isAysncCallBack() {
+        if (null == asyncCallBack) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 释放一个限流器(只能被释放一次)
      */
@@ -63,11 +70,16 @@ public class CmdFuture {
     /**
      * 执行回调
      */
-    public void executeInvokeCallback() {
+    public void executeInvokeCallback(boolean taskSuccessFlag) {
         if (asyncCallBack != null) {
             //防止并发执行回调
             if (this.executeCallbackOnlyOnce.compareAndSet(false, true)) {
-                asyncCallBack.execute(this);
+                if (taskSuccessFlag) {
+                    asyncCallBack.execute(this);
+                } else {
+                    asyncCallBack.executeFail(this);
+                }
+
             }
         }
     }

@@ -9,4 +9,6 @@ import com.sjw.fastnetty.common.CmdFuture;
  */
 public interface AsyncCallBack {
     void execute(final CmdFuture cmdFuture);
+
+    void executeFail(final CmdFuture cmdFuture);
 }

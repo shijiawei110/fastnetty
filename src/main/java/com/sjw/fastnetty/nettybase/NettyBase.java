@@ -121,6 +121,10 @@ public class NettyBase {
                 if (dif > dis) {
                     log.info("scan cmd container clear a dead requset -> sn={}", next.getKey());
                     it.remove();
+                    //执行回调
+                    if (v.isAysncCallBack()) {
+                        handleBase.executeAsyncCallback(v, false);
+                    }
                 }
             }
         }, 5000, 5000, TimeUnit.MILLISECONDS);

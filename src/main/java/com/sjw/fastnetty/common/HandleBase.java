@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.sjw.fastnetty.nettybase.listener.EventListenerExecutor;
 import com.sjw.fastnetty.protocol.CmdPackage;
 import com.sjw.fastnetty.utils.ChannelHelper;
+import com.sjw.fastnetty.utils.ThreadPoolUtil;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +34,9 @@ public class HandleBase {
     private RequestBefore requestBefore;
 
     private RequestAfter requestAfter;
+
+    private ExecutorService asyncCallbackPool = ThreadPoolUtil.createCustomPool("async-call", 1, 50);
+
 
     /**
      * 处理client请求
@@ -86,8 +90,18 @@ public class HandleBase {
             log.info("fastnetty server received a response but not find match request -> addr={} sn={}", addr, sn);
             return;
         }
-        cmdFuture.putResponse(cmdPackage);
         cmdContainer.remove(sn);
+        //异步请求且有回调
+        if (cmdFuture.isAysncCallBack()) {
+            executeAsyncCallback(cmdFuture, true);
+        }
+        //同步请求或者没有回调的异步请求
+        else {
+            cmdFuture.putResponse(cmdPackage);
+            //因为有可能没有是配置回调的异步请求,也要释放限流令牌
+            cmdFuture.releaseSemaphore();
+        }
+
     }
 
     /**
@@ -103,7 +117,6 @@ public class HandleBase {
     public void registerReqCmdProcessor(int code, ReqCmdProcessorHolder holder) {
         reqCmdProcessorHolders.put(code, holder);
     }
-
 
 
     public void setEventListenerExecutor(EventListenerExecutor eventListenerExecutor) {
@@ -175,14 +188,16 @@ public class HandleBase {
     /**
      * 请求被关闭
      */
-    protected void requestClose(long sn) {
+    public void requestClose(long sn) {
         CmdFuture cmdFuture = cmdContainer.remove(sn);
         //异步指令关闭操作
         if (cmdFuture != null) {
             cmdFuture.setSendRequestSuccess(false);
             cmdFuture.putResponse(null);
             try {
-                executeAsyncCallback(cmdFuture);
+                if (cmdFuture.isAysncCallBack()) {
+                    executeAsyncCallback(cmdFuture, false);
+                }
             } catch (Throwable e) {
                 log.warn("execute callback in request close, and callback throw", e);
             } finally {
@@ -192,10 +207,26 @@ public class HandleBase {
     }
 
     /**
-     * 执行异步请求callback
+     * 执行异步请求callback todo: 三个地方使用 callback需要有一个成功回调和一个失败回调,在清除僵尸请求的时候执行失败回调
      */
-    protected void executeAsyncCallback(CmdFuture cmdFuture){
-        //获取异步任务线程池
+    public void executeAsyncCallback(CmdFuture cmdFuture, boolean taskSuccessFlag) {
+        try {
+            asyncCallbackPool.execute(() -> doExecuteAsyncCallback(cmdFuture, taskSuccessFlag));
+        } catch (RejectedExecutionException e) {
+            log.error("async callback pool is full so reject request!");
+        }
+
     }
+
+    private void doExecuteAsyncCallback(CmdFuture cmdFuture, boolean taskSuccessFlag) {
+        try {
+            cmdFuture.executeInvokeCallback(taskSuccessFlag);
+        } catch (Exception e) {
+            log.error("do execute async callback error", e);
+        } finally {
+            cmdFuture.releaseSemaphore();
+        }
+    }
+
 
 }
