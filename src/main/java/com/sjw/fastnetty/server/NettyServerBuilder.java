@@ -33,7 +33,7 @@ public class NettyServerBuilder {
     /**
      * 是否配置对客户端的心跳监听 <=0 就是不配置 数值就是心跳超时时间(单位秒)
      */
-    private long heartBeatSeconds = 0;
+    private long heartBeatSeconds = 8;
 
     /**
      * 服务端最大连接数
