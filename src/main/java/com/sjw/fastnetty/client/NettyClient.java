@@ -1,5 +1,6 @@
 package com.sjw.fastnetty.client;
 
+import com.sjw.fastnetty.callback.AsyncCallBack;
 import com.sjw.fastnetty.client.handles.ClientChannelHandles;
 import com.sjw.fastnetty.common.ReqCmdProcessorHolder;
 import com.sjw.fastnetty.common.RequestAfter;
@@ -127,7 +128,16 @@ public class NettyClient extends NettyBase implements NetWorkClient {
         }
     }
 
-    // todo 增加一个异步cmd指令
+    @Override
+    public void cmdAsync(final String address, final CmdPackage cmd, final AsyncCallBack asyncCallBack) throws InterruptedException {
+        Channel channel = safeGetChannel(address);
+        if (ChannelHelper.alive(channel)) {
+            doCmdAsync(channel, cmd, nettyClientBuilder.getOutTimeMills(),asyncCallBack);
+        } else {
+            throw FastNettyException.CLIENT_GET_CHANNEL_ERROR;
+        }
+    }
+
 
     @Override
     public void cmdOneWay(String address, CmdPackage cmd) throws InterruptedException {

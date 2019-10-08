@@ -1,6 +1,7 @@
 package com.sjw.fastnetty.nettybase;
 
 import com.google.common.collect.Maps;
+import com.sjw.fastnetty.callback.AsyncCallBack;
 import com.sjw.fastnetty.client.SystemClosePolling;
 import com.sjw.fastnetty.common.CmdFuture;
 import com.sjw.fastnetty.common.HandleBase;
@@ -37,7 +38,7 @@ public class NettyBase {
     /**
      * 最短超时时间不能低于这个数字
      **/
-    protected static final long MIN_TIME_OUT_MILLS = 300L;
+    protected static final long MIN_TIME_OUT_MILLS = 100L;
     /**
      * 基础handle执行器
      */
@@ -180,7 +181,7 @@ public class NettyBase {
      */
     protected void doOneWay(final Channel channel, final CmdPackage request, final long timeOutMillis) throws InterruptedException {
         String linkAddr = ChannelHelper.getRemoteAddr(channel);
-        boolean acquired = this.oneWayLimit.tryAcquire(timeOutMillis, TimeUnit.MILLISECONDS);
+        boolean acquired = oneWayLimit.tryAcquire(timeOutMillis, TimeUnit.MILLISECONDS);
         if (acquired) {
             SemaphoreOnce semaphoreOnce = new SemaphoreOnce(oneWayLimit);
             try {
@@ -200,13 +201,40 @@ public class NettyBase {
             }
         } else {
             log.warn("one way request can not get the lock from semaphore -> totalNum={},now waiting thread num={}",
-                    this.oneWayLimit.getQueueLength(),
-                    this.oneWayLimit.availablePermits());
+                    oneWayLimit.getQueueLength(),
+                    oneWayLimit.availablePermits());
         }
     }
 
     /**
      * 异步指令
      */
+    protected void doCmdAsync(final Channel channel, final CmdPackage request, final long timeOutMillis, final AsyncCallBack asyncCallBack) throws InterruptedException {
+        final long sn = request.getSn();
+        String linkAddr = ChannelHelper.getRemoteAddr(channel);
+        boolean acquired = asyncLimit.tryAcquire(timeOutMillis, TimeUnit.MILLISECONDS);
+        if (acquired) {
+            SemaphoreOnce semaphoreOnce = new SemaphoreOnce(asyncLimit);
+            CmdFuture cmdFuture = new CmdFuture(sn, timeOutMillis, channel, semaphoreOnce, asyncCallBack);
+            cmdContainer.put(sn, cmdFuture);
+            try {
+                channel.writeAndFlush(request).addListener(future -> {
+                    if (!future.isSuccess()) {
+                        handleBase.requestClose(sn);
+                        log.warn("async request send complete but fail -> addr={} cmd={}",
+                                linkAddr, request.toString());
+                    }
+                });
+            } catch (Exception e) {
+                handleBase.requestClose(sn);
+                log.error("async request sending take a exception -> addr={} cmd={} stack={}",
+                        linkAddr, request.toString(), ExceptionUtils.getStackTrace(e));
+                throw e;
+            }
+        } else {
+            log.error("async request out of limit -> available : {}, all : {}", asyncLimit.availablePermits(), asyncLimit.getQueueLength());
+        }
+    }
+
 
 }

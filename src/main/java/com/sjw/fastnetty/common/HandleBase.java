@@ -210,7 +210,7 @@ public class HandleBase {
     }
 
     /**
-     * 执行异步请求callback todo: 三个地方使用 callback需要有一个成功回调和一个失败回调,在清除僵尸请求的时候执行失败回调
+     * 执行异步请求callback
      */
     public void executeAsyncCallback(CmdFuture cmdFuture, boolean taskSuccessFlag) {
         try {

@@ -1,5 +1,6 @@
 package com.sjw.fastnetty.nettybase.service;
 
+import com.sjw.fastnetty.callback.AsyncCallBack;
 import com.sjw.fastnetty.common.ReqCmdProcessorHolder;
 import com.sjw.fastnetty.common.RequestAfter;
 import com.sjw.fastnetty.common.RequestBefore;
@@ -16,6 +17,11 @@ public interface NetWorkClient extends NetWorkComService {
      * 同步指令
      */
     CmdPackage cmdSync(final String address, final CmdPackage cmd) throws InterruptedException;
+
+    /**
+     * 异步指令
+     */
+    void cmdAsync(final String address, final CmdPackage cmd, final AsyncCallBack asyncCallBack) throws InterruptedException;
 
     /**
      * 单向指令
