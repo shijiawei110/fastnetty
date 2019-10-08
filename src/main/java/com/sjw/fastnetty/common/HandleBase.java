@@ -152,7 +152,7 @@ public class HandleBase {
     }
 
     /**
-     * 销毁所有处理器线程池
+     * 销毁 1：全部的处理器线程池 2：异步请求线程
      */
     public void closeAllProcessor() {
         reqCmdProcessorHolders.forEach((k, v) -> {
@@ -161,6 +161,9 @@ public class HandleBase {
                 pool.shutdown();
             }
         });
+        if (null != asyncCallbackPool) {
+            asyncCallbackPool.shutdown();
+        }
     }
 
     /**
