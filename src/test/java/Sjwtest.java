@@ -1,5 +1,3 @@
-import freemarker.template.TemplateException;
-
 import java.io.IOException;
 
 /**
@@ -7,7 +5,7 @@ import java.io.IOException;
  */
 public class Sjwtest {
 
-    public static void main(String[] args) throws IOException, TemplateException {
+    public static void main(String[] args) throws IOException {
 
     }
 

@@ -18,7 +18,6 @@ public class FastNettyException extends RuntimeException {
     public static final FastNettyException CLIENT_GET_CHANNEL_ERROR = new FastNettyException(3001, "客户端获取连接异常");
     public static final FastNettyException CLIENT_REQ_OUT_TIME = new FastNettyException(3002, "客户端连接服务超时");
     public static final FastNettyException CLIENT_GET_CHANNEL_TABLE_LOCK_OUT_TIME = new FastNettyException(3003, "客户端获取连接表aqs锁超时");
-    public static final FastNettyException CLIENT_ADD_SERVER_NODE_PARAMS_ERROR= new FastNettyException(3004, "客户端添加服务缓存信息失败(参数不正确)");
 
     public static final FastNettyException CLIENT_SYSYTEM_ENDING = new FastNettyException(9998, "fastnetty客户端系统正在关闭,无法发出请求");
 
