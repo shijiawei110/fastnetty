@@ -48,13 +48,19 @@ public class ServerHandle extends SimpleChannelInboundHandler<CmdPackage> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         Channel channel = ctx.channel();
+        //检查系统状态
+        if (!handleBase.checkSystemStatus()) {
+            ChannelHelper.closeChannel(channel);
+            return;
+        }
         String addr = ChannelHelper.getRemoteAddr(channel);
         //到达最大连接数就直接关闭连接
         int currentChannelNumInt = channelAddrSet.size();
         if (currentChannelNumInt > maxChannelNum) {
-            log.error("fastnetty server reach limit channel num , close the channel -> addr = {}, currentChannelNum = {}, maxChannelNum",
+            log.error("fastnetty server reach limit channel num , close the channel -> addr = {}, currentChannelNum = {}, maxChannelNum = {}",
                     addr, currentChannelNumInt, maxChannelNum);
             ChannelHelper.closeChannel(channel);
+            return;
         }
         log.info("fastnetty server active a channel -> addr : {}", addr);
         if (handleBase.isOpenEventListener()) {
@@ -109,7 +115,7 @@ public class ServerHandle extends SimpleChannelInboundHandler<CmdPackage> {
                 handleBase.doResponse(channel, request);
                 break;
             default:
-                log.info("fastnetty server server handle receive a illegal cmd -> addr={} , cmdType ={]",
+                log.info("fastnetty server server handle receive a illegal cmd -> addr={} , cmdType ={}",
                         addr, request.getCmdType());
                 ChannelHelper.closeChannel(channel);
                 if (handleBase.isOpenEventListener()) {

@@ -3,6 +3,7 @@ package com.sjw.fastnetty.server;
 import com.sjw.fastnetty.common.ReqCmdProcessorHolder;
 import com.sjw.fastnetty.common.RequestAfter;
 import com.sjw.fastnetty.common.RequestBefore;
+import com.sjw.fastnetty.enums.SystemRunStatus;
 import com.sjw.fastnetty.exception.FastNettyException;
 import com.sjw.fastnetty.nettybase.NettyBase;
 import com.sjw.fastnetty.nettybase.listener.ChannelEventListener;
@@ -112,6 +113,8 @@ public class NettyServer extends NettyBase implements NetWorkServer {
      */
     @Override
     public void shutdown() {
+        //设置系统状态为closing
+        serverChannelHandles.getServerHandle().base().setSystemRunStatus(SystemRunStatus.ENDING);
         //安全注销过程 需要先把请求都处理完 轮询cmd容器直到全部完成或者超时
         shutdownWaitCmdComplete();
 

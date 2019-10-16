@@ -10,6 +10,7 @@ public enum ReqCmdError {
 
     SYSTEM_ERROR("系统错误", 9999),
     SYSTEM_BUSY("系统处理繁忙", 9998),
+    SYSTEM_CLOSING("系统正在关闭", 9998),
     NO_PROCESSOR("无对应请求应答处理器", 9901);
 
     private Integer code;

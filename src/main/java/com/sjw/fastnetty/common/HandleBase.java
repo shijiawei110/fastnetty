@@ -1,6 +1,7 @@
 package com.sjw.fastnetty.common;
 
 import com.google.common.collect.Maps;
+import com.sjw.fastnetty.enums.SystemRunStatus;
 import com.sjw.fastnetty.nettybase.listener.EventListenerExecutor;
 import com.sjw.fastnetty.protocol.CmdPackage;
 import com.sjw.fastnetty.utils.ChannelHelper;
@@ -37,6 +38,8 @@ public class HandleBase {
 
     private ExecutorService asyncCallbackPool = ThreadPoolUtil.createCustomPool("async-call", 1, 50);
 
+    private SystemRunStatus systemRunStatus = SystemRunStatus.RUNNING;
+
 
     /**
      * 处理client请求
@@ -50,6 +53,13 @@ public class HandleBase {
      */
     public void doRequest(Channel channel, CmdPackage request) {
         long sn = request.getSn();
+        //首先检查系统状态,如果关闭了则拒绝请求
+        if (!checkSystemStatus()) {
+            CmdPackage response = CmdPackage.errorRes(sn, ReqCmdError.SYSTEM_CLOSING);
+            channel.writeAndFlush(response);
+            return;
+        }
+
         // -> 1
         Integer code = request.getCmdCode();
         ReqCmdProcessorHolder processorHolder = reqCmdProcessorHolders.get(code);
@@ -151,6 +161,14 @@ public class HandleBase {
         return eventListenerExecutor;
     }
 
+    public SystemRunStatus getSystemRunStatus() {
+        return systemRunStatus;
+    }
+
+    public void setSystemRunStatus(SystemRunStatus systemRunStatus) {
+        this.systemRunStatus = systemRunStatus;
+    }
+
     /**
      * 销毁 1：全部的处理器线程池 2：异步回调线程池
      */
@@ -221,6 +239,17 @@ public class HandleBase {
 
     }
 
+    /**
+     * 检查系统状态
+     */
+    public boolean checkSystemStatus() {
+        if (systemRunStatus != SystemRunStatus.RUNNING) {
+            log.info("fastnetty check system status is not running");
+            return false;
+        }
+        return true;
+    }
+
     private void doExecuteAsyncCallback(CmdFuture cmdFuture, boolean taskSuccessFlag) {
         try {
             cmdFuture.executeInvokeCallback(taskSuccessFlag);
@@ -230,6 +259,5 @@ public class HandleBase {
             cmdFuture.releaseSemaphore();
         }
     }
-
 
 }
