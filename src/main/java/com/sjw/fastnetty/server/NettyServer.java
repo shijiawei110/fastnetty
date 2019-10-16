@@ -113,6 +113,7 @@ public class NettyServer extends NettyBase implements NetWorkServer {
      */
     @Override
     public void shutdown() {
+        log.info("fastnetty server start closing");
         //设置系统状态为closing
         serverChannelHandles.getServerHandle().base().setSystemRunStatus(SystemRunStatus.ENDING);
         //安全注销过程 需要先把请求都处理完 轮询cmd容器直到全部完成或者超时
@@ -130,6 +131,7 @@ public class NettyServer extends NettyBase implements NetWorkServer {
         closeClearNoResCmd();
         //关闭所有处理器线程池
         serverChannelHandles.getServerHandle().base().closeAllProcessor();
+        log.info("fastnetty server start close completed");
     }
 
     @Override

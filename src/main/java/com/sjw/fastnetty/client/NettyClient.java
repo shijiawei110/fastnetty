@@ -102,6 +102,7 @@ public class NettyClient extends NettyBase implements NetWorkClient {
      */
     @Override
     public void shutdown() {
+        log.info("fastnetty client start closing");
         //首先注销所有与server的channel连接
         clientChannelHandles.getClientHandle().shutdown();
 
@@ -114,6 +115,7 @@ public class NettyClient extends NettyBase implements NetWorkClient {
         closeClearNoResCmd();
         //关闭所有处理器线程池
         clientChannelHandles.getClientHandle().base().closeAllProcessor();
+        log.info("fastnetty client close completed");
     }
 
 
