@@ -1,5 +1,6 @@
 package com.sjw.fastnetty.utils;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
@@ -30,11 +31,11 @@ public class AqsKeeper {
      * 可中断和可超时 获取锁
      */
     public boolean tryLock(long outTimeMills) throws InterruptedException {
-        return aqsSync.tryAcquireNanos(LOCK, outTimeMills);
+        return aqsSync.tryAcquireNanos(LOCK, TimeUnit.MILLISECONDS.toNanos(outTimeMills));
     }
 
     public boolean tryLock() throws InterruptedException {
-        return aqsSync.tryAcquireNanos(LOCK, DEFAULT_OUT_TIME);
+        return aqsSync.tryAcquireNanos(LOCK, TimeUnit.MILLISECONDS.toNanos(DEFAULT_OUT_TIME));
     }
 
 
@@ -42,7 +43,7 @@ public class AqsKeeper {
      * 释放锁
      */
 
-    public void unlock(){
+    public void unlock() {
         aqsSync.tryRelease(UNLOCK);
     }
 
